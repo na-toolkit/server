@@ -11,6 +11,7 @@ import {
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppResolver } from './app.resolver';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -36,6 +37,12 @@ import { AppResolver } from './app.resolver';
             : ApolloServerPluginLandingPageProductionDefault,
         ],
       }),
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService<Configuration, true>) => {
+        return configService.get('database');
+      },
     }),
   ],
   controllers: [AppController],
