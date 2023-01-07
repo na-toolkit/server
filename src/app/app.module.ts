@@ -22,7 +22,6 @@ import { AppResolver } from './app.resolver';
     }),
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (
         configService: ConfigService<Configuration, true>,
