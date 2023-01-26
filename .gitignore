@@ -36,3 +36,4 @@ lerna-debug.log*
 
 schema.gql
 migration/*
+*.env
