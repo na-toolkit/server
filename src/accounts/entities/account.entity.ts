@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int, OmitType } from '@nestjs/graphql';
+import { ObjectType, Field, OmitType } from '@nestjs/graphql';
 import {
   Column,
   CreateDateColumn,
@@ -18,12 +18,16 @@ export class AccountTable {
   @Column({ length: 21, name: 'account_uid' })
   accountUid: string;
 
+  @Field({ description: '用戶頭像' })
+  @Column()
+  profile: string;
+
   @Field({ description: '用戶帳號' })
   @Column({ unique: true })
   account: string;
 
-  @Field({ description: '用戶名稱' })
-  @Column({})
+  @Field({ description: '用戶暱稱' })
+  @Column()
   name: string;
 
   @Column({ length: 60, select: false })

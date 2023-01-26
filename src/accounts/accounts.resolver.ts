@@ -8,18 +8,18 @@ import { UpdateAccountInput } from './dto/update-account.input';
 export class AccountsResolver {
   constructor(private readonly accountsService: AccountsService) {}
 
-  @Query(() => [Account], { name: 'accounts' })
-  findAll() {
-    return this.accountsService.findAll();
+  @Query(() => Account)
+  getAccount(@Args('accountUid') accountUid: string) {
+    return this.accountsService.findByUid(accountUid);
   }
 
-  @Query(() => Account, { name: 'account' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.accountsService.findOne(id);
+  @Mutation(() => Boolean, { description: '註冊帳號' })
+  register(@Args('input') createInput: CreateAccountInput) {
+    return this.accountsService.create(createInput);
   }
 
-  @Mutation(() => Account)
-  removeAccount(@Args('id', { type: () => Int }) id: number) {
-    return this.accountsService.remove(id);
+  @Mutation(() => Account, { description: '更新帳號信息' })
+  updateAccount(@Args('input') updateInput: UpdateAccountInput) {
+    return this.accountsService.update(updateInput);
   }
 }

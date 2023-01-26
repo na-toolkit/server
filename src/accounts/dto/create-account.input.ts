@@ -8,5 +8,5 @@ export class CreateAccountInput extends PickType(
   InputType,
 ) {
   @Field({ description: '用戶密碼' })
-  password: string;
+  passwordInput: string;
 }
