@@ -1,4 +1,4 @@
-import { ObjectType, Field, OmitType } from '@nestjs/graphql';
+import { ObjectType, Field, OmitType, registerEnumType } from '@nestjs/graphql';
 import {
   Column,
   CreateDateColumn,
@@ -7,6 +7,22 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+export enum AccountStatus {
+  None = 0,
+  Verify = 1,
+  Normal = 2,
+  Frozen = 99,
+}
+
+registerEnumType(AccountStatus, {
+  name: 'AccountStatus',
+  valuesMap: {
+    Verify: { description: '待驗證' },
+    Normal: { description: '正常' },
+    Frozen: { description: '凍結 ' },
+  },
+});
 
 @ObjectType()
 @Entity('accounts')
@@ -33,6 +49,10 @@ export class AccountTable {
   @Column({ length: 60, select: false })
   password?: string;
 
+  @Field(() => AccountStatus)
+  @Column()
+  status: AccountStatus;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
@@ -48,3 +68,9 @@ export class Account extends OmitType(AccountTable, [
   'password',
   'deletedAt',
 ]) {}
+
+@ObjectType()
+export class AccountWithPassword extends Account {
+  @Field({ description: '密碼' })
+  password?: string;
+}

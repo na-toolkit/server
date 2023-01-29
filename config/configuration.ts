@@ -1,9 +1,12 @@
+import { JwtModuleOptions } from '@nestjs/jwt';
 import * as Joi from 'joi';
 import { type DataSourceOptions } from 'typeorm';
 import { EnvDatabase, getDatabase } from './dataSource';
 
 interface Env extends EnvDatabase {
   MODE: 'test' | 'develop' | 'prod';
+  JWT_SECRET: 'string';
+  JWT_EXPIRES_IN: 'string';
 }
 
 export const validationSchema = Joi.object<Env, true>({
@@ -16,6 +19,8 @@ export const validationSchema = Joi.object<Env, true>({
   TYPEORM_DATABASE: Joi.string().required(),
   TYPEORM_ENTITIES: Joi.string().required(),
   TYPEORM_MIGRATIONS: Joi.string().required(),
+  JWT_SECRET: Joi.string().required(),
+  JWT_EXPIRES_IN: Joi.string().required(),
 });
 
 /* eslint-disable @typescript-eslint/no-namespace, @typescript-eslint/no-empty-interface */
@@ -26,10 +31,15 @@ declare global {
 }
 /* eslint-enable @typescript-eslint/no-namespace, @typescript-eslint/no-empty-interface */
 
+interface JwtOption {
+  secret: string;
+  expiresIn: string;
+}
 export interface Configuration {
   mode: 'test' | 'develop' | 'prod';
   isDev: boolean;
   database: DataSourceOptions;
+  jwt: JwtOption;
 }
 
 export const config = (): Configuration => {
@@ -37,5 +47,9 @@ export const config = (): Configuration => {
     mode: process.env.MODE,
     isDev: process.env.MODE !== 'prod',
     database: getDatabase(process.env),
+    jwt: {
+      secret: process.env.JWT_SECRET,
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    },
   };
 };
