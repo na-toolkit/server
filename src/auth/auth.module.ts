@@ -3,18 +3,15 @@ import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountTable } from '@/accounts/entities/account.entity';
-import { ConfigService } from '@nestjs/config';
-import { Configuration } from '@config/configuration';
 import { AuthGuard } from './auth.guard';
+import { CustomConfigService } from '@/shared/modules/custom-config/custom-config.service';
 
 @Global()
 @Module({
   imports: [
     JwtModule.registerAsync({
-      inject: [ConfigService],
-      useFactory: (
-        configService: ConfigService<Configuration, true>,
-      ): JwtModuleOptions => {
+      inject: [CustomConfigService],
+      useFactory: (configService: CustomConfigService): JwtModuleOptions => {
         const { secret, expiresIn } = configService.get('jwt');
         return {
           secret,
@@ -25,5 +22,6 @@ import { AuthGuard } from './auth.guard';
     TypeOrmModule.forFeature([AccountTable]),
   ],
   providers: [AuthService, AuthGuard],
+  exports: [AuthGuard, AuthService],
 })
 export class AuthModule {}

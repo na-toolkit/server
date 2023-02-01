@@ -14,12 +14,16 @@ import { encrypt } from '@/utils/bcrypt';
 import { formatUpdate } from '@/utils/orm-utils';
 import { validateInput } from '@/utils/validate-input';
 import { handleNotFoundException } from '@/utils/formatException';
+import { AuthService } from '@/auth/auth.service';
+import { LoginInput } from './dto/login.input';
+import { JwtSignOutput } from '@/auth/dto/jwt-sign.output';
 
 @Injectable()
 export class AccountsService {
   constructor(
     @InjectRepository(AccountTable)
     private accountRepo: Repository<AccountTable>,
+    private readonly authService: AuthService,
   ) {}
 
   private formatCreateAccountInput<
@@ -70,7 +74,10 @@ export class AccountsService {
     return true;
   }
 
-  async update(updateInput: UpdateAccountInput): Promise<boolean> {
+  async update(
+    updateInput: UpdateAccountInput,
+    account: Account,
+  ): Promise<boolean> {
     await validateInput({
       schema: (joi) =>
         joi.object<UpdateAccountInput, true>({
@@ -90,6 +97,7 @@ export class AccountsService {
           profile,
         }),
       )
+      .where('id = :id', { id: account.id })
       .execute();
     return true;
   }
@@ -106,5 +114,33 @@ export class AccountsService {
         log: '找不到該帳號',
       });
     }
+  }
+
+  async login(loginInput: LoginInput): Promise<JwtSignOutput> {
+    await validateInput({
+      schema: (joi) =>
+        joi.object<LoginInput, true>({
+          account: joi.string(),
+          passwordInput: joi.string(),
+        }),
+      input: loginInput,
+    });
+
+    const { account: accountInput, passwordInput } = loginInput;
+    const account = await this.authService.getValidAccount(
+      accountInput,
+      'account',
+      { password: true },
+    );
+    if (!account) {
+      throw handleNotFoundException({
+        log: '帳號不存在或凍結',
+      });
+    }
+    await this.authService.checkPassword(passwordInput, account);
+    const result = await this.authService.jwtSign({
+      accountUid: account.accountUid,
+    });
+    return result;
   }
 }

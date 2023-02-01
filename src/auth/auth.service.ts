@@ -14,6 +14,9 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JwtSignOutput } from './dto/jwt-sign.output';
+import ms from 'ms';
+import { CustomConfigService } from '@/shared/modules/custom-config/custom-config.service';
 
 export type jwtPayload = {
   accountUid: string;
@@ -21,12 +24,15 @@ export type jwtPayload = {
   exp: number;
 };
 
+export type jwtPayloadContent = Omit<jwtPayload, 'iat' | 'exp'>;
+
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     @InjectRepository(AccountTable)
     private readonly accountRepo: Repository<AccountTable>,
+    private readonly configService: CustomConfigService,
   ) {}
 
   async validateToken(token: string): Promise<jwtPayload | undefined> {
@@ -40,12 +46,43 @@ export class AuthService {
     }
   }
 
-  async getValidAccount(accountUid: string): Promise<Account | null> {
-    const account = await this.accountRepo
-      .createQueryBuilder('account')
-      .where('account.accountUid = :accountUid', { accountUid })
-      .andWhere('account.status = :status', { status: AccountStatus.Normal })
-      .getOne();
+  async getValidAccount(
+    input: string,
+    type: 'accountUid' | 'account',
+    opts: {
+      password: true;
+    },
+  ): Promise<AccountWithPassword | null>;
+  async getValidAccount(
+    input: string,
+    type: 'accountUid' | 'account',
+    opts?: {
+      password?: false;
+    },
+  ): Promise<Account | null>;
+  async getValidAccount(
+    input: string,
+    type: 'accountUid' | 'account',
+    opts?: {
+      password?: boolean;
+    },
+  ): Promise<Account | AccountWithPassword | null> {
+    const { password = false } = opts || {};
+    const builder = this.accountRepo.createQueryBuilder('account');
+    if (password) {
+      builder.addSelect('account.password');
+    }
+    builder.where('account.status = :status', { status: AccountStatus.Normal });
+    switch (type) {
+      case 'account':
+        builder.andWhere('account.account = :account', { account: input });
+        break;
+      case 'accountUid':
+        builder.andWhere('account.accountUid = :accountUid', {
+          accountUid: input,
+        });
+    }
+    const account = await builder.getOne();
     return account;
   }
 
@@ -99,7 +136,7 @@ export class AuthService {
   async authToken(auth: string | undefined): Promise<Account> {
     const [accountUid] = await this.checkToken(auth);
     try {
-      const account = await this.getValidAccount(accountUid);
+      const account = await this.getValidAccount(accountUid, 'accountUid');
       if (account === null) {
         throw handleUnauthorizedException({
           log: '帳號不存在或被凍結',
@@ -112,5 +149,12 @@ export class AuthService {
         log: `帳號不存在或被凍結: ${err?.message}`,
       });
     }
+  }
+
+  jwtSign(signContent: jwtPayloadContent): JwtSignOutput {
+    const accessToken = this.jwtService.sign(signContent);
+    const expiresIn = this.configService.get('jwt.expiresIn');
+    const expiresTimestamp = +new Date() + ms(expiresIn);
+    return { accessToken, expiresIn: new Date(expiresTimestamp) };
   }
 }

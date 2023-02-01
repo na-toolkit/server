@@ -16,6 +16,7 @@ specifiers:
   '@types/express': ^4.17.13
   '@types/jest': 29.2.4
   '@types/lodash': ^4.14.191
+  '@types/ms': ^0.7.31
   '@types/node': 18.11.18
   '@types/supertest': ^2.0.11
   '@typescript-eslint/eslint-plugin': ^5.0.0
@@ -23,6 +24,7 @@ specifiers:
   apollo-server-core: ^3.11.1
   apollo-server-express: ^3.11.1
   bcrypt: ^5.1.0
+  dayjs: ^1.11.7
   dotenv: ^16.0.3
   eslint: ^8.0.1
   eslint-config-prettier: ^8.3.0
@@ -31,6 +33,7 @@ specifiers:
   jest: 29.3.1
   joi: ^17.7.0
   lodash: ^4.17.21
+  ms: ^2.1.3
   mysql2: ^2.3.3
   nanoid: ^3.3.4
   prettier: ^2.3.2
@@ -57,10 +60,12 @@ dependencies:
   apollo-server-core: 3.11.1_graphql@16.6.0
   apollo-server-express: 3.11.1_graphql@16.6.0
   bcrypt: 5.1.0
+  dayjs: 1.11.7
   dotenv: 16.0.3
   graphql: 16.6.0
   joi: 17.7.0
   lodash: 4.17.21
+  ms: 2.1.3
   mysql2: 2.3.3
   nanoid: 3.3.4
   reflect-metadata: 0.1.13
@@ -75,6 +80,7 @@ devDependencies:
   '@types/express': 4.17.15
   '@types/jest': 29.2.4
   '@types/lodash': 4.14.191
+  '@types/ms': 0.7.31
   '@types/node': 18.11.18
   '@types/supertest': 2.0.12
   '@typescript-eslint/eslint-plugin': 5.48.0_k73wpmdolxikpyqun3p36akaaq
@@ -1674,6 +1680,10 @@ packages:
   /@types/mime/3.0.1:
     resolution: {integrity: sha512-Y4XFY5VJAuw0FgAqPNd6NNoV44jbq9Bz2L7Rh/J6jLTiHBSBJa9fxqQIvkIld4GsoDOcCbvzOUAbLPsSKKg+uA==}
 
+  /@types/ms/0.7.31:
+    resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
+    dev: true
+
   /@types/node/10.17.60:
     resolution: {integrity: sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==}
     dev: false
@@ -2764,6 +2774,10 @@ packages:
   /date-fns/2.29.3:
     resolution: {integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==}
     engines: {node: '>=0.11'}
+    dev: false
+
+  /dayjs/1.11.7:
+    resolution: {integrity: sha512-+Yw9U6YO5TQohxLcIkrXBeY73WP3ejHWVvx8XCk3gxvQDCTEmS48ZrSZCKciI7Bhl/uCMyxYtE9UqRILmFphkQ==}
     dev: false
 
   /debug/2.6.9:

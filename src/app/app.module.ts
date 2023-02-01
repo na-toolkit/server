@@ -1,7 +1,5 @@
-import { config, Configuration, validationSchema } from '@config/configuration';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'node:path';
 import {
@@ -12,21 +10,19 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppResolver } from './app.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AccountsModule } from '@/accounts/accounts.module';
+import { AuthModule } from '@/auth/auth.module';
+import { DateScalar } from '@/unixDate.scalar';
+import { CustomConfigModule } from '@/shared/modules/custom-config/custom-config.module';
+import { CustomConfigService } from '@/shared/modules/custom-config/custom-config.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      cache: true,
-      isGlobal: true,
-      validationSchema,
-      load: [config],
-    }),
+    CustomConfigModule,
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      inject: [ConfigService],
-      useFactory: async (
-        configService: ConfigService<Configuration, true>,
-      ) => ({
+      inject: [CustomConfigService],
+      useFactory: async (configService: CustomConfigService) => ({
         debug: configService.get('isDev'),
         playground: false,
         sortSchema: true,
@@ -39,13 +35,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       }),
     }),
     TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService<Configuration, true>) => {
+      inject: [CustomConfigService],
+      useFactory: async (configService: CustomConfigService) => {
         return configService.get('database');
       },
     }),
+    AuthModule,
+    AccountsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AppResolver],
+  providers: [AppService, AppResolver, DateScalar],
 })
 export class AppModule {}
