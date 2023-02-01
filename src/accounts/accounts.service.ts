@@ -4,7 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateAccountInput } from './dto/create-account.input';
 import { UpdateAccountInput } from './dto/update-account.input';
-import { Account, AccountTable } from './entities/account.entity';
+import {
+  Account,
+  AccountStatus,
+  AccountTable,
+} from './entities/account.entity';
 import { nanoid } from 'nanoid/async';
 import { encrypt } from '@/utils/bcrypt';
 import { formatUpdate } from '@/utils/orm-utils';
@@ -23,13 +27,16 @@ export class AccountsService {
       accountUid: string;
       password: string;
       profile?: string;
+      status?: AccountStatus;
     },
   >({
     profile = '',
+    status = AccountStatus.Normal,
     ...rest
   }: T): OmitTable<AccountTable> & { password: string } {
     return {
       profile,
+      status,
       ...rest,
     };
   }

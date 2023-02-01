@@ -1,11 +1,11 @@
 import { Module, Global } from '@nestjs/common';
 import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
-import { AuthResolver } from './auth.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountTable } from '@/accounts/entities/account.entity';
 import { ConfigService } from '@nestjs/config';
 import { Configuration } from '@config/configuration';
+import { AuthGuard } from './auth.guard';
 
 @Global()
 @Module({
@@ -24,6 +24,6 @@ import { Configuration } from '@config/configuration';
     }),
     TypeOrmModule.forFeature([AccountTable]),
   ],
-  providers: [AuthResolver, AuthService],
+  providers: [AuthService, AuthGuard],
 })
 export class AuthModule {}
