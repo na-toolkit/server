@@ -104,7 +104,7 @@ export class AccountsService {
 
   async findByUid(accountUid: string): Promise<Account> {
     try {
-      const account = this.accountRepo
+      const account = await this.accountRepo
         .createQueryBuilder('account')
         .where('account.accountUid = :accountUid', { accountUid })
         .getOneOrFail();

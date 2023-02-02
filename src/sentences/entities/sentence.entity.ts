@@ -1,9 +1,19 @@
-import { Field, ObjectType, OmitType } from '@nestjs/graphql';
+import { Account, AccountTable } from '@/accounts/entities/account.entity';
+import { Pagination } from '@/shared/dto/pagination.output';
+import {
+  Field,
+  IntersectionType,
+  ObjectType,
+  OmitType,
+  PickType,
+} from '@nestjs/graphql';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -30,6 +40,14 @@ export class SentenceTable {
   @Column({ type: 'text' })
   note: string;
 
+  @Field(() => Account, { description: '所屬帳號' })
+  @ManyToOne(() => AccountTable, (account) => account.id)
+  @JoinColumn({ name: 'account_id', referencedColumnName: 'id' })
+  account: Account;
+
+  @Column({ name: 'account_id' })
+  accountId: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
@@ -41,4 +59,25 @@ export class SentenceTable {
 }
 
 @ObjectType()
-export class Sentence extends OmitType(SentenceTable, ['deletedAt']) {}
+export class Sentence extends OmitType(SentenceTable, [
+  'deletedAt',
+  'account',
+]) {}
+
+@ObjectType()
+export class SentenceWithAccount extends IntersectionType(
+  Sentence,
+  PickType(SentenceTable, ['account']),
+) {}
+
+@ObjectType()
+export class SentenceInList extends Sentence {}
+
+@ObjectType()
+export class SentenceWithPagination {
+  @Field(() => [SentenceInList])
+  data: SentenceInList[];
+
+  @Field(() => Pagination, { description: '分頁資訊' })
+  paginationInfo: Pagination;
+}
