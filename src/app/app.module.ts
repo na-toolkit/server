@@ -15,6 +15,7 @@ import { AuthModule } from '@/auth/auth.module';
 import { DateScalar } from '@/unixDate.scalar';
 import { CustomConfigModule } from '@/shared/modules/custom-config/custom-config.module';
 import { CustomConfigService } from '@/shared/modules/custom-config/custom-config.service';
+import { SentencesModule } from '@/sentences/sentences.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { CustomConfigService } from '@/shared/modules/custom-config/custom-confi
     }),
     AuthModule,
     AccountsModule,
+    SentencesModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver, DateScalar],
