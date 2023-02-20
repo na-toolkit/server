@@ -104,7 +104,7 @@ export class SentencesService {
   async create(
     createInput: CreateSentenceInput,
     account: Account,
-  ): Promise<boolean> {
+  ): Promise<OmitTable<Sentence>> {
     await validateInput({
       schema: (joi) =>
         joi.object<CreateSentenceInput, true>({
@@ -117,20 +117,19 @@ export class SentencesService {
 
     const { content, translation, note } = createInput;
     const sentenceUid = await nanoid();
+    const createItem = this.formatCreateSentence({
+      sentenceUid,
+      accountId: account.id,
+      content: content.trim(),
+      translation: translation?.trim(),
+      note,
+    });
     await this.sentenceRepo
       .createQueryBuilder('sentence')
       .insert()
-      .values(
-        this.formatCreateSentence({
-          sentenceUid,
-          accountId: account.id,
-          content: content.trim(),
-          translation: translation?.trim(),
-          note,
-        }),
-      )
+      .values(createItem)
       .execute();
-    return true;
+    return createItem;
   }
 
   async update(

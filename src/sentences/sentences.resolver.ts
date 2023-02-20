@@ -1,6 +1,7 @@
 import { JwtAccount } from '@/account.decorator';
 import { Account } from '@/accounts/entities/account.entity';
 import { AuthGuard } from '@/auth/auth.guard';
+import { OmitTable } from '@/utils/omitTable';
 import { UseGuards } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CreateSentenceInput } from './dto/create-sentence.input';
@@ -32,11 +33,11 @@ export class SentencesResolver {
     return result;
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => Sentence)
   async createSentence(
     @Args('input') createInput: CreateSentenceInput,
     @JwtAccount() account: Account,
-  ): Promise<boolean> {
+  ): Promise<OmitTable<Sentence>> {
     const result = await this.sentencesService.create(createInput, account);
     return result;
   }

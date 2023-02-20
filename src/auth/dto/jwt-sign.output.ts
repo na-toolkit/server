@@ -5,6 +5,6 @@ export class JwtSignOutput {
   @Field({ description: 'token' })
   accessToken: string;
 
-  @Field({ description: '有效時間（單位：分）' })
+  @Field({ description: '有效時間' })
   expiresIn: Date;
 }
