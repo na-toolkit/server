@@ -166,4 +166,14 @@ export class SentencesService {
       .execute();
     return true;
   }
+
+  async remove(sentenceUid: string, account: Account): Promise<boolean> {
+    const sentence = await this.findByUid(sentenceUid, account);
+    await this.sentenceRepo
+      .createQueryBuilder('sentence')
+      .softDelete()
+      .where('id = :id', { id: sentence.id })
+      .execute();
+    return true;
+  }
 }

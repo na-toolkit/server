@@ -50,4 +50,13 @@ export class SentencesResolver {
     const result = await this.sentencesService.update(updateInput, account);
     return result;
   }
+
+  @Mutation(() => Boolean)
+  async removeSentence(
+    @Args('sentenceUid') sentenceUid: string,
+    @JwtAccount() account: Account,
+  ): Promise<boolean> {
+    const result = await this.sentencesService.remove(sentenceUid, account);
+    return result;
+  }
 }

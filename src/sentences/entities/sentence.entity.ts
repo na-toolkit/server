@@ -25,7 +25,7 @@ export class SentenceTable {
   id: number;
 
   @Field({ description: 'UID' })
-  @Column({ length: 21, name: 'sentence_uid' })
+  @Column({ length: 21, name: 'sentence_uid', unique: true })
   sentenceUid: string;
 
   @Field({ description: '內容' })
