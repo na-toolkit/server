@@ -25,7 +25,7 @@ WORKDIR ${COPY_PATH}
 
 RUN yarn global add pnpm
 
-COPY --from=builder /app/dist .
+COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json .
 COPY --from=builder /app/node_modules ./node_modules
 

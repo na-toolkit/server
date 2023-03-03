@@ -11,7 +11,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main",
     "typeorm": "ts-node -r tsconfig-paths/register --project tsconfig.json ./node_modules/typeorm/cli.js",
     "migration:g": "pnpm build && pnpm typeorm migration:generate -d ./config/dataSource.ts ./migration/migrate",
     "migration:g:prod": "pnpm build && pnpm typeorm migration:generate -d ./config/dataSource.ts ./migration-prod/migrate",
