@@ -24,6 +24,8 @@ FROM node:16-alpine AS runner
 WORKDIR ${COPY_PATH}
 
 COPY --from=builder /app/dist .
+COPY --from=builder /app/package.json .
+COPY --from=builder /app/node_modules .
 
 ENTRYPOINT ["yarn", "migration:r"]
 
