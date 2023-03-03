@@ -29,6 +29,6 @@ COPY --from=builder /app/dist .
 COPY --from=builder /app/package.json .
 COPY --from=builder /app/node_modules .
 
-ENTRYPOINT ["yarn", "migration:r"]
+# ENTRYPOINT ["yarn", "migration:r"]
 
 CMD ["yarn", "start:prod"]
