@@ -31,6 +31,6 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/config ./config
 COPY --from=builder /app/node_modules ./node_modules
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+# ENTRYPOINT ["docker-entrypoint.sh"]
 
 CMD ["yarn", "start:prod"]
