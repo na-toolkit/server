@@ -25,11 +25,12 @@ WORKDIR /app
 
 RUN yarn global add pnpm
 
+COPY deploy/docker-entrypoint.sh /usr/local/bin/
 COPY --from=builder /app/package.json /app/.env /app/tsconfig.json /app/tsconfig.paths.json .
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/config ./config
 COPY --from=builder /app/node_modules ./node_modules
 
-ENTRYPOINT ["yarn", "migration:r"]
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 CMD ["yarn", "start:prod"]
