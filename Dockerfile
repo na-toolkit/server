@@ -18,19 +18,18 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN \
-  yarn global add pnpm && \
-  yarn build && \
-  yarn migration:r
+RUN yarn build
 
 FROM node:16-alpine AS runner
 WORKDIR /app
 
 RUN yarn global add pnpm
 
+COPY --from=builder /app/package.json /app/.env .
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json .
-COPY --from=builder /app/.env .
+COPY --from=builder /app/config ./config
 COPY --from=builder /app/node_modules ./node_modules
+
+ENTRYPOINT ["yarn", "migration:r"]
 
 CMD ["yarn", "start:prod"]
