@@ -25,7 +25,7 @@ WORKDIR /app
 
 RUN yarn global add pnpm
 
-COPY --from=builder /app/package.json /app/.env .
+COPY --from=builder /app/package.json /app/.env /app/tsconfig.json .
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/config ./config
 COPY --from=builder /app/node_modules ./node_modules
