@@ -19,6 +19,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 RUN \
+  yarn global add pnpm && \
   yarn build && \
   yarn migration:r
 
