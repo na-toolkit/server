@@ -14,16 +14,25 @@ jobs:
           channel-id: 'C04T31UQSQ2'
           payload: |
             {
-              "text": "Deployment started (In Progress)",
               "attachments": [
                 {
-                  "pretext": "Deployment started",
-                  "color": "dbab09",
+                  "color": "2871a7",
+                  "author_name": "${{ github.triggering_actor }}",
+                  "author_link": "https://github.com/${{ github.triggering_actor }}",
+                  "author_icon": "https://github.com/${{ github.triggering_actor }}.png?size=40",
+                  "title": "${{ github.repository }}",
+                  "title_link": "https://github.com/${{ github.repository }}",
+                  "thumb_url": "http://placekitten.com/g/200/200",
                   "fields": [
                     {
                       "title": "Status",
                       "short": true,
                       "value": "In Progress"
+                    },
+                    {
+                      "title": "Event",
+                      "short": true,
+                      "value": "${{ github.event_name }}"
                     }
                   ]
                 }
@@ -38,16 +47,25 @@ jobs:
           update-ts: ${{ steps.slack.outputs.ts }}
           payload: |
             {
-              "text": "Deployment finished (Completed)",
               "attachments": [
                 {
-                  "pretext": "Deployment finished",
                   "color": "28a745",
+                  "author_name": "${{ github.triggering_actor }}",
+                  "author_link": "https://github.com/${{ github.triggering_actor }}",
+                  "author_icon": "https://github.com/${{ github.triggering_actor }}.png?size=40",
+                  "title": "${{ github.repository }}",
+                  "title_link": "https://github.com/${{ github.repository }}",
+                  "thumb_url": "http://placekitten.com/g/200/200",
                   "fields": [
                     {
                       "title": "Status",
                       "short": true,
                       "value": "Completed"
+                    },
+                    {
+                      "title": "Event",
+                      "short": true,
+                      "value": "${{ github.event_name }}"
                     }
                   ]
                 }
@@ -63,16 +81,25 @@ jobs:
           update-ts: ${{ steps.slack.outputs.ts }}
           payload: |
             {
-              "text": "Deployment finished (Failed)",
               "attachments": [
                 {
-                  "pretext": "Deployment failed",
-                  "color": "28a745",
+                  "color": "a7283e",
+                  "author_name": "${{ github.triggering_actor }}",
+                  "author_link": "https://github.com/${{ github.triggering_actor }}",
+                  "author_icon": "https://github.com/${{ github.triggering_actor }}.png?size=40",
+                  "title": "${{ github.repository }}",
+                  "title_link": "https://github.com/${{ github.repository }}",
+                  "thumb_url": "http://placekitten.com/g/200/200",
                   "fields": [
                     {
                       "title": "Status",
                       "short": true,
                       "value": "Failed"
+                    },
+                    {
+                      "title": "Event",
+                      "short": true,
+                      "value": "${{ github.event_name }}"
                     }
                   ]
                 }
