@@ -1,0 +1,60 @@
+name: Slack notify about complete
+
+on:
+  workflow_call:
+    inputs:
+      ts:
+        required: true
+        type: string
+      time:
+        required: true
+        type: string
+      channelId:
+        required: true
+        type: string
+    secrets:
+      slackBotToken:
+        required: true
+
+jobs:
+  send:
+    name: Message Send
+    runs-on: ubuntu-latest
+    steps:
+      - uses: slackapi/slack-github-action@v1.23.0
+        with:
+          channel-id: ${{ inputs.channelId }}
+          update-ts: ${{ inputs.ts }}
+          payload: |
+            {
+              "attachments": [
+                {
+                  "color": "28a745",
+                  "author_name": "${{ github.triggering_actor }}",
+                  "author_link": "https://github.com/${{ github.triggering_actor }}",
+                  "author_icon": "https://github.com/${{ github.triggering_actor }}.png?size=40",
+                  "title": "${{ github.repository }}",
+                  "title_link": "https://github.com/${{ github.repository }}",
+                  "thumb_url": "http://placekitten.com/g/200/200",
+                  "fields": [
+                    {
+                      "title": "Status",
+                      "short": true,
+                      "value": "Completed"
+                    },
+                    {
+                      "title": "Event",
+                      "short": true,
+                      "value": "${{ github.event_name }}"
+                    },
+                    {
+                      "title": "Time",
+                      "short": true,
+                      "value": "${{ inputs.time }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.slackBotToken }}

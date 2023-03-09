@@ -1,0 +1,36 @@
+name: ssh to server for building and deploying
+
+on:
+  workflow_call:
+    inputs:
+      repoName:
+        required: true
+        type: string
+    secrets:
+      sshHost:
+        required: true
+      sshUser:
+        required: true
+      sshPrivateKey:
+        required: true
+      sshPort:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: build and deploy
+        uses: appleboy/ssh-action@master
+        host: ${{ secrets.sshHost }}
+        username: ${{ secrets.sshUser }}
+        key: ${{ secrets.sshPrivateKey }}
+        port: ${{ secrets.sshPort }}
+        script: |
+          cd ~/app/${{ inputs.repoName }}
+          git stash
+          git stash claer
+          git checkout master
+          git pull
+          cd ~/app/docker-cicd/
+          docker compose up --build -d ${{ inputs.repoName }}

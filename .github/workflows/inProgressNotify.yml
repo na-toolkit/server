@@ -1,0 +1,68 @@
+name: Slack notify about in progress
+
+on:
+  workflow_call:
+    inputs:
+      channelId:
+        required: true
+        type: string
+    secrets:
+      slackBotToken:
+        required: true
+    outputs:
+      ts:
+        value: ${{ jobs.send.outputs.ts }}
+      time:
+        value: ${{ jobs.send.outputs.time }}
+
+jobs:
+  send:
+    name: Message Send
+    runs-on: ubuntu-latest
+    outputs:
+      ts: ${{ steps.slack.outputs.ts }}
+      time: ${{ steps.current-time.outputs.formattedTime }}
+    steps:
+      - name: Get current time
+        id: current-time
+        uses: josStorer/get-current-time@v2
+        with:
+          format: YYYY-MM-DD HH:mm:ss
+          utcOffset: '+08:00'
+      - id: slack
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          channel-id: ${{ inputs.channelId }}
+          payload: |
+            {
+              "attachments": [
+                {
+                  "color": "2871a7",
+                  "author_name": "${{ github.triggering_actor }}",
+                  "author_link": "https://github.com/${{ github.triggering_actor }}",
+                  "author_icon": "https://github.com/${{ github.triggering_actor }}.png?size=40",
+                  "title": "${{ github.repository }}",
+                  "title_link": "https://github.com/${{ github.repository }}",
+                  "thumb_url": "http://placekitten.com/g/200/200",
+                  "fields": [
+                    {
+                      "title": "Status",
+                      "short": true,
+                      "value": "In Progress"
+                    },
+                    {
+                      "title": "Event",
+                      "short": true,
+                      "value": "${{ github.event_name }}"
+                    },
+                    {
+                      "title": "Time",
+                      "short": true,
+                      "value": "${{ steps.current-time.outputs.formattedTime }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.slackBotToken }}

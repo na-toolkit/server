@@ -2,81 +2,33 @@ name: notify
 on:
   push:
     branches:
-      - notify
+      - notify-legacy
 jobs:
-  deploy:
+  call-in-progress-notify:
+    uses: ./.github/workflows/inProgressNotify.yml
+    secrets:
+      slackBotToken: ${{ secrets.SLACK_BOT_TOKEN }}
+  body:
     runs-on: ubuntu-latest
+    needs: call-in-progress-notify
     steps:
-      - name: Deploy Start Notify
-        id: slack
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          channel-id: 'C04T31UQSQ2'
-          payload: |
-            {
-              "text": "Deployment started (In Progress)",
-              "attachments": [
-                {
-                  "pretext": "Deployment started",
-                  "color": "dbab09",
-                  "fields": [
-                    {
-                      "title": "Status",
-                      "short": true,
-                      "value": "In Progress"
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      - name: Deploy Complete Notify
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          channel-id: 'C04T31UQSQ2'
-          update-ts: ${{ steps.slack.outputs.ts }}
-          payload: |
-            {
-              "text": "Deployment finished (Completed)",
-              "attachments": [
-                {
-                  "pretext": "Deployment finished",
-                  "color": "28a745",
-                  "fields": [
-                    {
-                      "title": "Status",
-                      "short": true,
-                      "value": "Completed"
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
-      - name: Deploy Failure Notify
-        if: ${{ failure() || cancelled() }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          channel-id: 'C04T31UQSQ2'
-          update-ts: ${{ steps.slack.outputs.ts }}
-          payload: |
-            {
-              "text": "Deployment finished (Failed)",
-              "attachments": [
-                {
-                  "pretext": "Deployment failed",
-                  "color": "28a745",
-                  "fields": [
-                    {
-                      "title": "Status",
-                      "short": true,
-                      "value": "Failed"
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
+      - name: Sleep for 10 seconds
+        run: sleep 10s
+        shell: bash
+  call-complete-notify:
+    needs: [body, call-in-progress-notify]
+    uses: ./.github/workflows/completeNotify.yml
+    with:
+      ts: ${{ needs.call-in-progress-notify.outputs.ts }}
+      time: ${{ needs.call-in-progress-notify.outputs.time }}
+    secrets:
+      slackBotToken: ${{ secrets.SLACK_BOT_TOKEN }}
+  call-failure-notify:
+    needs: [body, call-in-progress-notify]
+    if: ${{ failure() }}
+    uses: ./.github/workflows/failureNotify.yml
+    with:
+      ts: ${{ needs.call-in-progress-notify.outputs.ts }}
+      time: ${{ needs.call-in-progress-notify.outputs.time }}
+    secrets:
+      slackBotToken: ${{ secrets.SLACK_BOT_TOKEN }}

@@ -4,21 +4,41 @@ on:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 jobs:
+  call-in-progress-notify:
+    uses: ./.github/workflows/inProgressNotify.yml
+    with:
+      channelId: ${{ vars.SLACK_DEPLOY_CHANNEL_ID }}
+    secrets:
+      slackBotToken: ${{ secrets.SLACK_BOT_TOKEN }}
+
   deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            cd ~/app/${{ vars.REPO_NAME }}
-            git stash
-            git stash claer
-            git checkout master
-            git pull
-            cd ~/app/docker-cicd/
-            docker compose up --build -d ${{ vars.REPO_NAME }}
+    needs: call-in-progress-notify
+    uses: ./.github/workflows/sshDeploy.yml
+    with:
+      repoName: ${{ vars.REPO_NAME }}
+    secrets:
+      sshHost: ${{ secrets.SSH_HOST }}
+      sshUser: ${{ secrets.SSH_USER }}
+      sshPrivateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+      sshPort: ${{ secrets.SSH_PORT }}
+
+  call-complete-notify:
+    needs: [body, call-in-progress-notify]
+    uses: ./.github/workflows/completeNotify.yml
+    with:
+      ts: ${{ needs.call-in-progress-notify.outputs.ts }}
+      time: ${{ needs.call-in-progress-notify.outputs.time }}
+      channelId: ${{ vars.SLACK_DEPLOY_CHANNEL_ID }}
+    secrets:
+      slackBotToken: ${{ secrets.SLACK_BOT_TOKEN }}
+
+  call-failure-notify:
+    needs: [body, call-in-progress-notify]
+    if: ${{ failure() }}
+    uses: ./.github/workflows/failureNotify.yml
+    with:
+      ts: ${{ needs.call-in-progress-notify.outputs.ts }}
+      time: ${{ needs.call-in-progress-notify.outputs.time }}
+      channelId: ${{ vars.SLACK_DEPLOY_CHANNEL_ID }}
+    secrets:
+      slackBotToken: ${{ secrets.SLACK_BOT_TOKEN }}
