@@ -9,7 +9,7 @@ on:
       ts:
         value: ${{ jobs.send.outputs.ts }}
       time:
-        value: ${{ jobs.send.output.time }}
+        value: ${{ jobs.send.outputs.time }}
 
 jobs:
   send:
