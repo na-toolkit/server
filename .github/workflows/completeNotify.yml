@@ -6,6 +6,10 @@ on:
       ts:
         required: true
         type: number
+    secrets:
+      SLACK_BOT_TOKEN:
+        required: true
+        type: string
 
 jobs:
   send:

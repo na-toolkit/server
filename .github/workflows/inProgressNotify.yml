@@ -2,6 +2,10 @@ name: Slack notify about in progress
 
 on:
   workflow_call:
+    secrets:
+      SLACK_BOT_TOKEN:
+        required: true
+        type: string
     outputs:
       ts:
         value: ${{ jobs.send.output.ts }}
