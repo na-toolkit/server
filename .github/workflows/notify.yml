@@ -7,7 +7,7 @@ jobs:
   call-in-progress-notify:
     uses: ./.github/workflows/inProgressNotify.yml
     secrets:
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      slackBotToken: ${{ secrets.SLACK_BOT_TOKEN }}
   body:
     runs-on: ubuntu-latest
     needs: call-in-progress-notify
@@ -20,13 +20,15 @@ jobs:
     uses: ./.github/workflows/completeNotify.yml
     with:
       ts: ${{ needs.call-in-progress-notify.outputs.ts }}
+      time: ${{ needs.call-in-progress-notify.outputs.time }}
     secrets:
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      slackBotToken: ${{ secrets.SLACK_BOT_TOKEN }}
   call-failure-notify:
     needs: [body, call-in-progress-notify]
     if: ${{ failure() }}
     uses: ./.github/workflows/failureNotify.yml
     with:
       ts: ${{ needs.call-in-progress-notify.outputs.ts }}
+      time: ${{ needs.call-in-progress-notify.outputs.time }}
     secrets:
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      slackBotToken: ${{ secrets.SLACK_BOT_TOKEN }}

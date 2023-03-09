@@ -6,8 +6,11 @@ on:
       ts:
         required: true
         type: string
+      time:
+        required: true
+        type: string
     secrets:
-      SLACK_BOT_TOKEN:
+      slackBotToken:
         required: true
 
 jobs:
@@ -44,11 +47,11 @@ jobs:
                     {
                       "title": "Time",
                       "short": true,
-                      "value": "${{ github.event.repository.updated_at}}"
+                      "value": "${{ inputs.time }}"
                     }
                   ]
                 }
               ]
             }
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.slackBotToken }}

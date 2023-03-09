@@ -3,11 +3,13 @@ name: Slack notify about in progress
 on:
   workflow_call:
     secrets:
-      SLACK_BOT_TOKEN:
+      slackBotToken:
         required: true
     outputs:
       ts:
         value: ${{ jobs.send.outputs.ts }}
+      time:
+        value: ${{ jobs.send.output.time }}
 
 jobs:
   send:
@@ -15,7 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       ts: ${{ steps.slack.outputs.ts }}
+      time: ${{ steps.current-time.outputs.formattedTime }}
     steps:
+      - name: Get current time
+        id: current-time
+        uses: josStorer/get-current-time@v2
+        with:
+          format: YYYY-MM-DD HH:mm:ss
+          utcOffset: '+08:00'
       - id: slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
@@ -45,11 +54,11 @@ jobs:
                     {
                       "title": "Time",
                       "short": true,
-                      "value": "${{ github.event.repository.updated_at}}"
+                      "value": "${{ steps.current-time.outputs.formattedTime }}"
                     }
                   ]
                 }
               ]
             }
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.slackBotToken }}
