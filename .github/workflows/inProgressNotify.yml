@@ -41,6 +41,11 @@ jobs:
                       "title": "Event",
                       "short": true,
                       "value": "${{ github.event_name }}"
+                    },
+                    {
+                      "title": "Time",
+                      "short": true,
+                      "value": "${{ github.event.repository.updated_at}}"
                     }
                   ]
                 }
