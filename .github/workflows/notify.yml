@@ -40,6 +40,9 @@ jobs:
             }
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      - name: Sleep for 10 seconds
+        run: sleep 10s
+        shell: bash
       - name: Deploy Complete Notify
         uses: slackapi/slack-github-action@v1.23.0
         with:
