@@ -22,15 +22,16 @@ jobs:
     steps:
       - name: build and deploy
         uses: appleboy/ssh-action@master
-        host: ${{ secrets.sshHost }}
-        username: ${{ secrets.sshUser }}
-        key: ${{ secrets.sshPrivateKey }}
-        port: ${{ secrets.sshPort }}
-        script: |
-          cd ~/app/${{ inputs.repoName }}
-          git stash
-          git stash claer
-          git checkout master
-          git pull
-          cd ~/app/docker-cicd/
-          docker compose up --build -d ${{ inputs.repoName }}
+        with:
+          host: ${{ secrets.sshHost }}
+          username: ${{ secrets.sshUser }}
+          key: ${{ secrets.sshPrivateKey }}
+          port: ${{ secrets.sshPort }}
+          script: |
+            cd ~/app/${{ inputs.repoName }}
+            git stash
+            git stash claer
+            git checkout master
+            git pull
+            cd ~/app/docker-cicd/
+            docker compose up --build -d ${{ inputs.repoName }}
