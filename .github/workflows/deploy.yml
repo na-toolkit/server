@@ -23,7 +23,7 @@ jobs:
       sshPort: ${{ secrets.SSH_PORT }}
 
   call-complete-notify:
-    needs: [body, call-in-progress-notify]
+    needs: [deploy, call-in-progress-notify]
     uses: ./.github/workflows/completeNotify.yml
     with:
       ts: ${{ needs.call-in-progress-notify.outputs.ts }}
@@ -33,7 +33,7 @@ jobs:
       slackBotToken: ${{ secrets.SLACK_BOT_TOKEN }}
 
   call-failure-notify:
-    needs: [body, call-in-progress-notify]
+    needs: [deploy, call-in-progress-notify]
     if: ${{ failure() }}
     uses: ./.github/workflows/failureNotify.yml
     with:
