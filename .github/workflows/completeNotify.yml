@@ -9,7 +9,6 @@ on:
     secrets:
       SLACK_BOT_TOKEN:
         required: true
-        type: string
 
 jobs:
   send:
