@@ -7,7 +7,7 @@ on:
         required: true
     outputs:
       ts:
-        value: ${{ jobs.send.output.ts }}
+        value: ${{ jobs.send.outputs.ts }}
 
 jobs:
   send:
