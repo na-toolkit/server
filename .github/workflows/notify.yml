@@ -16,15 +16,16 @@ jobs:
         run: sleep 10s
         shell: bash
   call-complete-notify:
-    uses: ./.github/workflows/completeNotify.yml
     needs: [body, call-in-progress-notify]
+    uses: ./.github/workflows/completeNotify.yml
     with:
       ts: ${{ needs.call-in-progress-notify.outputs.ts }}
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
   call-failure-notify:
-    uses: ./.github/workflows/failureNotify.yml
     needs: [body, call-in-progress-notify]
+    if: ${{ failure() }}
+    uses: ./.github/workflows/failureNotify.yml
     with:
       ts: ${{ needs.call-in-progress-notify.outputs.ts }}
     secrets:
