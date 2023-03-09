@@ -31,7 +31,7 @@ export class AccountTable {
   id: number;
 
   @Field({ description: 'UID' })
-  @Column({ length: 21, name: 'account_uid' })
+  @Column({ length: 21, name: 'account_uid', unique: true })
   accountUid: string;
 
   @Field({ description: '用戶頭像' })

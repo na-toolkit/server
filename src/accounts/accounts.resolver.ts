@@ -18,7 +18,6 @@ export class AccountsResolver {
     return this.accountsService.login(loginInput);
   }
 
-  @UseGuards(AuthGuard)
   @Mutation(() => Boolean, { description: '註冊帳號' })
   register(@Args('input') createInput: CreateAccountInput) {
     return this.accountsService.create(createInput);
