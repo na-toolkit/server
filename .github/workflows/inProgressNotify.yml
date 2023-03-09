@@ -1,0 +1,47 @@
+name: Slack notify about in progress
+
+on:
+  workflow_call:
+    outputs:
+      ts:
+        value: ${{ jobs.send.output.ts }}
+
+jobs:
+  send:
+    name: Message Send
+    runs-on: ubuntu-latest
+    outputs:
+      ts: ${{ steps.slack.outputs.ts }}
+    steps:
+      - id: slack
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          channel-id: 'C04T31UQSQ2'
+          payload: |
+            {
+              "attachments": [
+                {
+                  "color": "2871a7",
+                  "author_name": "${{ github.triggering_actor }}",
+                  "author_link": "https://github.com/${{ github.triggering_actor }}",
+                  "author_icon": "https://github.com/${{ github.triggering_actor }}.png?size=40",
+                  "title": "${{ github.repository }}",
+                  "title_link": "https://github.com/${{ github.repository }}",
+                  "thumb_url": "http://placekitten.com/g/200/200",
+                  "fields": [
+                    {
+                      "title": "Status",
+                      "short": true,
+                      "value": "In Progress"
+                    },
+                    {
+                      "title": "Event",
+                      "short": true,
+                      "value": "${{ github.event_name }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

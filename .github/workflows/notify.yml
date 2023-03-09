@@ -4,109 +4,22 @@ on:
     branches:
       - notify
 jobs:
-  deploy:
+  call-in-progress-notify:
+    use: ./.github/workflows/inProgressNotify.yml
+  body:
     runs-on: ubuntu-latest
+    needs: call-in-progress-notify
     steps:
-      - name: Deploy Start Notify
-        id: slack
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          channel-id: 'C04T31UQSQ2'
-          payload: |
-            {
-              "attachments": [
-                {
-                  "color": "2871a7",
-                  "author_name": "${{ github.triggering_actor }}",
-                  "author_link": "https://github.com/${{ github.triggering_actor }}",
-                  "author_icon": "https://github.com/${{ github.triggering_actor }}.png?size=40",
-                  "title": "${{ github.repository }}",
-                  "title_link": "https://github.com/${{ github.repository }}",
-                  "thumb_url": "http://placekitten.com/g/200/200",
-                  "fields": [
-                    {
-                      "title": "Status",
-                      "short": true,
-                      "value": "In Progress"
-                    },
-                    {
-                      "title": "Event",
-                      "short": true,
-                      "value": "${{ github.event_name }}"
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       - name: Sleep for 10 seconds
         run: sleep 10s
         shell: bash
-      - name: Deploy Complete Notify
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          channel-id: 'C04T31UQSQ2'
-          update-ts: ${{ steps.slack.outputs.ts }}
-          payload: |
-            {
-              "attachments": [
-                {
-                  "color": "28a745",
-                  "author_name": "${{ github.triggering_actor }}",
-                  "author_link": "https://github.com/${{ github.triggering_actor }}",
-                  "author_icon": "https://github.com/${{ github.triggering_actor }}.png?size=40",
-                  "title": "${{ github.repository }}",
-                  "title_link": "https://github.com/${{ github.repository }}",
-                  "thumb_url": "http://placekitten.com/g/200/200",
-                  "fields": [
-                    {
-                      "title": "Status",
-                      "short": true,
-                      "value": "Completed"
-                    },
-                    {
-                      "title": "Event",
-                      "short": true,
-                      "value": "${{ github.event_name }}"
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
-      - name: Deploy Failure Notify
-        if: ${{ failure() || cancelled() }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          channel-id: 'C04T31UQSQ2'
-          update-ts: ${{ steps.slack.outputs.ts }}
-          payload: |
-            {
-              "attachments": [
-                {
-                  "color": "a7283e",
-                  "author_name": "${{ github.triggering_actor }}",
-                  "author_link": "https://github.com/${{ github.triggering_actor }}",
-                  "author_icon": "https://github.com/${{ github.triggering_actor }}.png?size=40",
-                  "title": "${{ github.repository }}",
-                  "title_link": "https://github.com/${{ github.repository }}",
-                  "thumb_url": "http://placekitten.com/g/200/200",
-                  "fields": [
-                    {
-                      "title": "Status",
-                      "short": true,
-                      "value": "Failed"
-                    },
-                    {
-                      "title": "Event",
-                      "short": true,
-                      "value": "${{ github.event_name }}"
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
+  call-complete-notify:
+    use: ./.github/workflows/completeNotify.yml
+    needs: body
+    with:
+      ts: ${{ jobs.call-in-progress-notify.outputs.ts }}
+  call-failure-notify:
+    use: ./.github/workflows/failureNotify.yml
+    needs: body
+    with:
+      ts: ${{ jobs.call-in-progress-notify.outputs.ts }}
