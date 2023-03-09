@@ -15,11 +15,11 @@ jobs:
         shell: bash
   call-complete-notify:
     uses: ./.github/workflows/completeNotify.yml
-    needs: body
+    needs: [body, call-in-progress-notify]
     with:
-      ts: ${{ jobs.call-in-progress-notify.outputs.ts }}
+      ts: ${{ needs.call-in-progress-notify.outputs.ts }}
   call-failure-notify:
     uses: ./.github/workflows/failureNotify.yml
-    needs: body
+    needs: [body, call-in-progress-notify]
     with:
-      ts: ${{ jobs.call-in-progress-notify.outputs.ts }}
+      ts: ${{ needs.call-in-progress-notify.outputs.ts }}
