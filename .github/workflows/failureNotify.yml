@@ -8,7 +8,7 @@ on:
         type: number
     secrets:
       SLACK_BOT_TOKEN:
-        type: string
+        required: true
 
 jobs:
   send:
