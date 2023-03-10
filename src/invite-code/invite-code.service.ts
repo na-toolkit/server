@@ -13,11 +13,11 @@ export class InviteCodeService {
 
   async findByCode(code: string): Promise<InviteCode> {
     try {
-      const account = await this.codeRepo
+      const inviteCode = await this.codeRepo
         .createQueryBuilder('code')
         .where('code.code = :code', { code })
         .getOneOrFail();
-      return account;
+      return inviteCode;
     } catch (err) {
       throw handleNotFoundException({
         log: '找不到該邀請碼',
