@@ -105,15 +105,15 @@ export class SentencesService {
     createInput: CreateSentenceInput,
     account: Account,
   ): Promise<OmitTable<Sentence>> {
-    await validateInput({
-      schema: (joi) =>
-        joi.object<CreateSentenceInput, true>({
-          content: joi.string().required(),
-          translation: joi.string().allow('').optional(),
-          note: joi.string().allow('').optional(),
-        }),
-      input: createInput,
-    });
+    // await validateInput({
+    //   schema: (joi) =>
+    //     joi.object<CreateSentenceInput, true>({
+    //       content: joi.string().required(),
+    //       translation: joi.string().allow('').optional(),
+    //       note: joi.string().allow('').optional(),
+    //     }),
+    //   input: createInput,
+    // });
 
     const { content, translation, note } = createInput;
     const sentenceUid = await nanoid();
@@ -136,16 +136,16 @@ export class SentencesService {
     updateInput: UpdateSentenceInput,
     account: Account,
   ): Promise<boolean> {
-    await validateInput({
-      schema: (joi) =>
-        joi.object<UpdateSentenceInput, true>({
-          sentenceUid: joi.string().length(21).required(),
-          content: joi.string().optional(),
-          translation: joi.string().allow('').optional(),
-          note: joi.string().allow('').optional(),
-        }),
-      input: updateInput,
-    });
+    // await validateInput({
+    //   schema: (joi) =>
+    //     joi.object<UpdateSentenceInput, true>({
+    //       sentenceUid: joi.string().length(21).required(),
+    //       content: joi.string().optional(),
+    //       translation: joi.string().allow('').optional(),
+    //       note: joi.string().allow('').optional(),
+    //     }),
+    //   input: updateInput,
+    // });
 
     const { sentenceUid, content, translation, note } = updateInput;
     const sentence = await this.findByUid(sentenceUid, account);

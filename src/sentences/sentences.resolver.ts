@@ -1,8 +1,9 @@
 import { JwtAccount } from '@/account.decorator';
 import { Account } from '@/accounts/entities/account.entity';
 import { AuthGuard } from '@/auth/auth.guard';
+import { GqlJoiToDtoPipe } from '@/joi-validation.pipe';
 import { OmitTable } from '@/utils/omitTable';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, UsePipes } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CreateSentenceInput } from './dto/create-sentence.input';
 import { SearchSentenceWithPaginationInput } from './dto/search-sentence.input';
@@ -10,6 +11,7 @@ import { UpdateSentenceInput } from './dto/update-sentence.input';
 import { Sentence, SentenceWithPagination } from './entities/sentence.entity';
 import { SentencesService } from './sentences.service';
 
+@UsePipes(new GqlJoiToDtoPipe([CreateSentenceInput, UpdateSentenceInput]))
 @UseGuards(AuthGuard)
 @Resolver()
 export class SentencesResolver {

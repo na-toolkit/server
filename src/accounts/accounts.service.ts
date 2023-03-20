@@ -53,19 +53,21 @@ export class AccountsService {
   }
 
   async create(createInput: CreateAccountInput): Promise<boolean> {
-    await validateInput({
-      schema: (joi) =>
-        joi.object<CreateAccountInput, true>({
-          account: joi.string(),
-          name: joi.string(),
-          passwordInput: joi.string(),
-          code: joi.string(),
-        }),
-      input: createInput,
-    });
+    // await validateInput({
+    //   schema: (joi) =>
+    //     joi.object<CreateAccountInput, true>({
+    //       account: joi.string(),
+    //       name: joi.string(),
+    //       passwordInput: joi.string(),
+    //       code: joi.string(),
+    //     }),
+    //   input: createInput,
+    // });
 
     const { account, name, passwordInput, code } = createInput;
-    const inviteCode = await this.inviteCodeService.findByCode(code);
+    const inviteCode = await this.inviteCodeService.findByCode(code, {
+      valid: true,
+    });
     const password = await encrypt(passwordInput);
     const accountUid = await nanoid();
 
@@ -107,14 +109,14 @@ export class AccountsService {
     updateInput: UpdateAccountInput,
     account: Account,
   ): Promise<boolean> {
-    await validateInput({
-      schema: (joi) =>
-        joi.object<UpdateAccountInput, true>({
-          name: joi.string(),
-          profile: joi.string(),
-        }),
-      input: updateInput,
-    });
+    // await validateInput({
+    //   schema: (joi) =>
+    //     joi.object<UpdateAccountInput, true>({
+    //       name: joi.string(),
+    //       profile: joi.string(),
+    //     }),
+    //   input: updateInput,
+    // });
 
     const { name, profile } = updateInput;
     await this.accountRepo
@@ -146,14 +148,14 @@ export class AccountsService {
   }
 
   async login(loginInput: LoginInput): Promise<JwtSignOutput> {
-    await validateInput({
-      schema: (joi) =>
-        joi.object<LoginInput, true>({
-          account: joi.string(),
-          passwordInput: joi.string(),
-        }),
-      input: loginInput,
-    });
+    // await validateInput({
+    //   schema: (joi) =>
+    //     joi.object<LoginInput, true>({
+    //       account: joi.string(),
+    //       passwordInput: joi.string(),
+    //     }),
+    //   input: loginInput,
+    // });
 
     const { account: accountInput, passwordInput } = loginInput;
     const account = await this.authService.getValidAccount(

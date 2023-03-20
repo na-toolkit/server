@@ -1,14 +1,18 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { AccountsService } from './accounts.service';
 import { Account } from './entities/account.entity';
 import { CreateAccountInput } from './dto/create-account.input';
 import { UpdateAccountInput } from './dto/update-account.input';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, UsePipes } from '@nestjs/common';
 import { AuthGuard } from '@/auth/auth.guard';
 import { JwtAccount } from '@/account.decorator';
 import { LoginInput } from './dto/login.input';
 import { JwtSignOutput } from '@/auth/dto/jwt-sign.output';
+import { GqlJoiToDtoPipe } from '@/joi-validation.pipe';
 
+@UsePipes(
+  new GqlJoiToDtoPipe([CreateAccountInput, UpdateAccountInput, LoginInput]),
+)
 @Resolver(() => Account)
 export class AccountsResolver {
   constructor(private readonly accountsService: AccountsService) {}

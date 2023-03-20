@@ -2,7 +2,11 @@ import { handleNotFoundException } from '@/utils/formatException';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { InviteCode, InviteCodeTable } from './entities/invite-code.entity';
+import {
+  InviteCode,
+  InviteCodeStatus,
+  InviteCodeTable,
+} from './entities/invite-code.entity';
 
 @Injectable()
 export class InviteCodeService {
@@ -11,12 +15,23 @@ export class InviteCodeService {
     private codeRepo: Repository<InviteCodeTable>,
   ) {}
 
-  async findByCode(code: string): Promise<InviteCode> {
+  async findByCode(
+    code: string,
+    opts?: {
+      valid?: boolean;
+    },
+  ): Promise<InviteCode> {
+    const { valid } = opts || {};
     try {
-      const inviteCode = await this.codeRepo
+      const builder = await this.codeRepo
         .createQueryBuilder('code')
-        .where('code.code = :code', { code })
-        .getOneOrFail();
+        .where('code.code = :code', { code });
+      if (valid === true) {
+        builder.andWhere('code.status = :status', {
+          status: InviteCodeStatus.Valid,
+        });
+      }
+      const inviteCode = builder.getOneOrFail();
       return inviteCode;
     } catch (err) {
       throw handleNotFoundException({
