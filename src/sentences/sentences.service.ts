@@ -1,4 +1,5 @@
 import { Account } from '@/accounts/entities/account.entity';
+import { escapeLikeString } from '@/utils/escapeLikeString';
 import { handleNotFoundException } from '@/utils/formatException';
 import { OmitTable } from '@/utils/omitTable';
 import { formatUpdate } from '@/utils/orm-utils';
@@ -79,9 +80,18 @@ export class SentencesService {
     searchInput: SearchSentenceWithPaginationInput | SearchSentenceInput,
     account: Account,
   ): Promise<SentenceWithPagination | SentenceInList[]> {
+    const { keyword } = searchInput;
+
     const builder = this.sentenceRepo
       .createQueryBuilder('sentence')
       .where('sentence.accountId = :accountId', { accountId: account.id });
+
+    if (keyword) {
+      builder.andWhere('sentence.content LIKE :keyword', {
+        keyword: `%${escapeLikeString(keyword)}%`,
+      });
+    }
+
     builder.orderBy('sentence.updatedAt', 'DESC');
 
     if ('paginationInfo' in searchInput) {
