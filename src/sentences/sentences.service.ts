@@ -92,7 +92,7 @@ export class SentencesService {
       });
     }
 
-    builder.orderBy('sentence.updatedAt', 'DESC');
+    builder.orderBy('sentence.createdAt', 'DESC');
 
     if ('paginationInfo' in searchInput) {
       const {
