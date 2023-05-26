@@ -12,7 +12,7 @@ export class CreateSentenceInput extends IntersectionType(
   PartialType(PickType(Sentence, ['translation', 'note'], InputType)),
   PickType(Sentence, ['content'], InputType),
 ) {
-  static schema(joi: Root) {
+  static joiSchema(joi: Root) {
     return joi.object<CreateSentenceInput, true>({
       content: joi.string().required(),
       translation: joi.string().allow('').optional(),

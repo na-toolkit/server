@@ -1,4 +1,4 @@
-import { handleGeneralException } from '@/utils/generalException';
+import { handleGeneralException } from '@/utils/generalHttpException';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';

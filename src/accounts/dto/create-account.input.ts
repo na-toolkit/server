@@ -8,7 +8,7 @@ export class CreateAccountInput extends IntersectionType(
   PickType(Account, ['account', 'name'], InputType),
   PickType(InviteCode, ['code'], InputType),
 ) {
-  static schema(joi: Root) {
+  static joiSchema(joi: Root) {
     return joi.object<CreateAccountInput, true>({
       account: joi.string(),
       name: joi.string(),

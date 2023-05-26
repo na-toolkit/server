@@ -1,6 +1,6 @@
 import { Account } from '@/accounts/entities/account.entity';
 import { escapeLikeString } from '@/utils/escapeLikeString';
-import { handleGeneralException } from '@/utils/generalException';
+import { handleGeneralException } from '@/utils/generalHttpException';
 import { OmitTable } from '@/utils/omitTable';
 import { formatUpdate } from '@/utils/orm-utils';
 import { Injectable } from '@nestjs/common';

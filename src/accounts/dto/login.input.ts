@@ -3,10 +3,10 @@ import { Root } from 'joi';
 
 @InputType()
 export class LoginInput {
-  static schema(joi: Root) {
+  static joiSchema(joi: Root) {
     return joi.object<LoginInput, true>({
-      account: joi.string(),
-      passwordInput: joi.string(),
+      account: joi.string().required(),
+      passwordInput: joi.string().required(),
     });
   }
 

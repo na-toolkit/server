@@ -1,4 +1,3 @@
-import { JwtModuleOptions } from '@nestjs/jwt';
 import * as Joi from 'joi';
 import { type DataSourceOptions } from 'typeorm';
 import { EnvDatabase, getDatabase } from './dataSource';
@@ -8,6 +7,7 @@ interface Env extends EnvDatabase {
   MODE: 'test' | 'develop' | 'prod';
   JWT_SECRET: 'string';
   JWT_EXPIRES_IN: 'string';
+  ORIGIN: string;
 }
 
 export const validationSchema = Joi.object<Env, true>({
@@ -22,6 +22,7 @@ export const validationSchema = Joi.object<Env, true>({
   TYPEORM_MIGRATIONS: Joi.string().required(),
   JWT_SECRET: Joi.string().required(),
   JWT_EXPIRES_IN: Joi.string().required(),
+  ORIGIN: Joi.string().allow(''),
 });
 
 /* eslint-disable @typescript-eslint/no-namespace, @typescript-eslint/no-empty-interface */
@@ -50,20 +51,22 @@ export interface Configuration {
   logger: LoggerOption;
 }
 
+export const isDev = () => process.env.MODE !== 'prod';
+
 export const config = (): Configuration => {
-  const isDev = process.env.MODE !== 'prod';
+  const isDevRes = isDev();
   return {
     mode: process.env.MODE,
-    isDev,
+    isDev: isDevRes,
     database: getDatabase(process.env),
     jwt: {
       secret: process.env.JWT_SECRET,
       expiresIn: process.env.JWT_EXPIRES_IN,
     },
     logger: {
-      level: isDev ? 'debug' : 'info',
-      ignore: isDev ? ['pid', 'hostname'] : [],
-      singleLine: isDev ? false : true,
+      level: isDevRes ? 'debug' : 'info',
+      ignore: isDevRes ? ['pid', 'hostname'] : [],
+      singleLine: isDevRes ? false : true,
     },
   };
 };

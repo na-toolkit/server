@@ -8,11 +8,9 @@ import { AuthGuard } from '@/auth/auth.guard';
 import { JwtAccount } from '@/account.decorator';
 import { LoginInput } from './dto/login.input';
 import { JwtSignOutput } from '@/auth/dto/jwt-sign.output';
-import { GqlJoiToDtoPipe } from '@/joi-validation.pipe';
+import { DtoJoiValidationPipe } from '@/joi-validation.pipe';
 
-@UsePipes(
-  new GqlJoiToDtoPipe([CreateAccountInput, UpdateAccountInput, LoginInput]),
-)
+@UsePipes(new DtoJoiValidationPipe())
 @Resolver(() => Account)
 export class AccountsResolver {
   constructor(private readonly accountsService: AccountsService) {}
@@ -30,6 +28,7 @@ export class AccountsResolver {
   @UseGuards(AuthGuard)
   @Mutation(() => Boolean, { description: '更新帳號信息' })
   updateAccount(
+    @Args('test') test: string,
     @Args('input') updateInput: UpdateAccountInput,
     @JwtAccount() account: Account,
   ): Promise<boolean> {

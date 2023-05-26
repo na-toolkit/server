@@ -7,7 +7,7 @@ import {
   GraphQLRequestContext,
 } from '@apollo/server';
 import { type IncomingMessage } from 'http';
-import { ExceptionExtensions } from '@/utils/generalException';
+import { ExceptionExtensions } from '@/utils/generalHttpException';
 import { PinoLogger } from 'nestjs-pino';
 
 /**
@@ -48,7 +48,7 @@ export class GraphQLLoggerPlugin<TContext extends IncomingMessage>
 
 type RequestListenerErrorObj = {
   level: LogLevel;
-  errors: Array<ExceptionExtensions['originalError']>;
+  errors: Array<ExceptionExtensions['debugInfo']>;
 };
 
 class RequestListener<TContext extends IncomingMessage>
@@ -82,8 +82,7 @@ class RequestListener<TContext extends IncomingMessage>
     const { level, errors } = errorsCtx.errors.reduce<RequestListenerErrorObj>(
       (acc, cur) => {
         const { level: currentLevel, errors } = acc;
-        const { statusCode, originalError } =
-          cur.extensions as ExceptionExtensions;
+        const { statusCode, debugInfo } = cur.extensions as ExceptionExtensions;
         let errorLevel: LogLevel = 'log';
         if (statusCode >= 400 && statusCode < 500) {
           errorLevel = 'warn';
@@ -94,7 +93,7 @@ class RequestListener<TContext extends IncomingMessage>
           LOG_LEVEL_VALUES[currentLevel] > LOG_LEVEL_VALUES[errorLevel]
             ? currentLevel
             : errorLevel;
-        errors.push(originalError);
+        errors.push(debugInfo);
         return { level, errors };
       },
       { level: 'log', errors: [] },

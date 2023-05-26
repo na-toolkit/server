@@ -6,7 +6,7 @@ import { Root } from 'joi';
 export class UpdateAccountInput extends PartialType(
   PickType(CreateAccountInput, ['name']),
 ) {
-  static schema(joi: Root) {
+  static joiSchema(joi: Root) {
     return joi.object<UpdateAccountInput, true>({
       name: joi.string(),
       profile: joi.string(),

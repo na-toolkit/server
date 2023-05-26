@@ -1,4 +1,5 @@
 import { defaultInfoByHttpStatus } from '@/const/defaultInfoByHttpStatus';
+import { ErrorMessageCode } from '@/shared/types/errorMessageCode';
 import {
   HttpException,
   HttpStatus,
@@ -8,14 +9,14 @@ import { isPlainObject } from 'lodash';
 
 export type ExceptionExtensions = {
   statusCode: HttpStatus;
-  originalError?: string | object | any;
+  code: string;
+  messageCode?: ErrorMessageCode;
+  debugInfo?: string | object | any;
 };
 
-class GeneralException extends HttpException {
-  readonly extensions: {
-    statusCode: HttpStatus;
-    originalError?: string | object | any;
-  };
+class GeneralHttpException extends HttpException {
+  public readonly extensions: ExceptionExtensions;
+  public readonly message: string;
 
   public static getDefaultInfoByHttpStatus<
     T extends keyof typeof defaultInfoByHttpStatus,
@@ -31,34 +32,40 @@ class GeneralException extends HttpException {
     const {
       statusCode,
       description: defaultDescription,
-      messageCode,
-    } = GeneralException.getDefaultInfoByHttpStatus(type);
+      messageCode: defaultMessageCode,
+    } = GeneralHttpException.getDefaultInfoByHttpStatus(type);
 
     const { description, httpExceptionOptions } =
       HttpException.extractDescriptionAndOptionsFrom(
         descriptionOrOptions || defaultDescription,
       );
 
+    const messageCode =
+      (isPlainObject(objectOrError) &&
+        (objectOrError['messageCode'] as ErrorMessageCode)) ||
+      defaultMessageCode;
+
     super(
-      HttpException.createBody(objectOrError, description, statusCode),
+      HttpException.createBody(
+        { messageCode, debugInfo: objectOrError },
+        description,
+        statusCode,
+      ),
       statusCode,
       httpExceptionOptions,
     );
 
-    let originalError;
-    // 在沒有指定 messageCode 的情況下，如果有預設值，就補上
-    if (
-      messageCode &&
-      isPlainObject(objectOrError) &&
-      !objectOrError['messageCode']
-    ) {
-      originalError = { ...objectOrError, messageCode };
-    } else originalError = objectOrError;
-    this.extensions = { statusCode, originalError };
+    this.message = defaultDescription;
+    this.extensions = {
+      statusCode,
+      messageCode,
+      code: defaultDescription,
+      debugInfo: objectOrError,
+    };
   }
 }
 
-type OriginalError = {
+type ObjectOrError = {
   messageCode?: string;
   log?: string;
   variables?: Record<string, string>;
@@ -67,10 +74,10 @@ type OriginalError = {
 
 export const handleGeneralException = (
   type: keyof typeof defaultInfoByHttpStatus,
-  originalError?: OriginalError,
+  objectOrError?: ObjectOrError,
   descriptionOrOptions?: string | HttpExceptionOptions,
 ) => {
-  return new GeneralException(type, originalError, descriptionOrOptions);
+  return new GeneralHttpException(type, objectOrError, descriptionOrOptions);
 };
 
 // export const handleBadRequestException = ({

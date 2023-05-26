@@ -6,7 +6,7 @@ import {
 } from '@/accounts/entities/account.entity';
 import { ErrorMessageCode } from '@/shared/types/errorMessageCode';
 import { validEncrypt } from '@/utils/bcrypt';
-import { handleGeneralException } from '@/utils/generalException';
+import { handleGeneralException } from '@/utils/generalHttpException';
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';

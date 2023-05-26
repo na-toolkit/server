@@ -1,5 +1,5 @@
 import * as Joi from 'joi';
-import { handleGeneralException } from './generalException';
+import { handleGeneralException } from './generalHttpException';
 
 export const validateInput = async <T>({
   schema,

@@ -4,7 +4,7 @@ import { Root } from 'joi';
 
 @InputType()
 export class UpdateSentenceInput extends PartialType(CreateSentenceInput) {
-  static schema(joi: Root) {
+  static joiSchema(joi: Root) {
     return joi.object<UpdateSentenceInput, true>({
       sentenceUid: joi.string().length(21).required(),
       content: joi.string().optional(),
