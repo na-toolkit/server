@@ -12,8 +12,7 @@ import {
 import { nanoid } from 'nanoid/async';
 import { encrypt } from '@/utils/bcrypt';
 import { formatUpdate } from '@/utils/orm-utils';
-import { validateInput } from '@/utils/validate-input';
-import { handleNotFoundException } from '@/utils/formatException';
+import { handleGeneralException } from '@/utils/generalException';
 import { AuthService } from '@/auth/auth.service';
 import { LoginInput } from './dto/login.input';
 import { JwtSignOutput } from '@/auth/dto/jwt-sign.output';
@@ -141,9 +140,7 @@ export class AccountsService {
         .getOneOrFail();
       return account;
     } catch (err) {
-      throw handleNotFoundException({
-        log: '找不到該帳號',
-      });
+      throw handleGeneralException('NOT_FOUND', { log: '找不到該帳號' });
     }
   }
 
@@ -164,9 +161,7 @@ export class AccountsService {
       { password: true },
     );
     if (!account) {
-      throw handleNotFoundException({
-        log: '帳號不存在或凍結',
-      });
+      throw handleGeneralException('NOT_FOUND', { log: '帳號不存在或凍結' });
     }
     await this.authService.checkPassword(passwordInput, account);
     const result = await this.authService.jwtSign({

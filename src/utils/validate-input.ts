@@ -1,6 +1,5 @@
-import { ErrorMessageCode } from '@/shared/types/errorMessageCode';
 import * as Joi from 'joi';
-import { handleBadRequestException } from './formatException';
+import { handleGeneralException } from './generalException';
 
 export const validateInput = async <T>({
   schema,
@@ -13,9 +12,8 @@ export const validateInput = async <T>({
     const validateSchema = await schema(Joi);
     await validateSchema.validateAsync(input);
   } catch (err) {
-    throw handleBadRequestException({
-      messageCode: ErrorMessageCode.BAD_REQUEST,
-      log: err,
+    throw handleGeneralException('BAD_REQUEST', {
+      log: err?.message,
     });
   }
 };

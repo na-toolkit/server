@@ -1,4 +1,4 @@
-import { handleNotFoundException } from '@/utils/formatException';
+import { handleGeneralException } from '@/utils/generalException';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -34,7 +34,7 @@ export class InviteCodeService {
       const inviteCode = builder.getOneOrFail();
       return inviteCode;
     } catch (err) {
-      throw handleNotFoundException({
+      throw handleGeneralException('NOT_FOUND', {
         log: '找不到該邀請碼',
       });
     }

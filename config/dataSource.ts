@@ -26,7 +26,7 @@ export const getDatabase = (env: EnvDatabase): DataSourceOptions => ({
   host: env.TYPEORM_HOST,
   port: +env.TYPEORM_PORT,
   logger: 'advanced-console',
-  logging: true,
+  logging: ['error', 'warn', 'info', 'query', 'log', 'migration'],
   username: env.TYPEORM_USERNAME,
   password: env.TYPEORM_PASSWORD,
   charset: 'utf8mb4_unicode_ci',

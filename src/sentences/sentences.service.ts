@@ -1,9 +1,8 @@
 import { Account } from '@/accounts/entities/account.entity';
 import { escapeLikeString } from '@/utils/escapeLikeString';
-import { handleNotFoundException } from '@/utils/formatException';
+import { handleGeneralException } from '@/utils/generalException';
 import { OmitTable } from '@/utils/omitTable';
 import { formatUpdate } from '@/utils/orm-utils';
-import { validateInput } from '@/utils/validate-input';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { nanoid } from 'nanoid/async';
@@ -62,7 +61,7 @@ export class SentencesService {
       const sentence = await builder.getOneOrFail();
       return sentence;
     } catch (err) {
-      throw handleNotFoundException({
+      throw handleGeneralException('NOT_FOUND', {
         log: '找不到該句子',
       });
     }

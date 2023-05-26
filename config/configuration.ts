@@ -2,6 +2,7 @@ import { JwtModuleOptions } from '@nestjs/jwt';
 import * as Joi from 'joi';
 import { type DataSourceOptions } from 'typeorm';
 import { EnvDatabase, getDatabase } from './dataSource';
+import type { LevelWithSilent } from 'pino';
 
 interface Env extends EnvDatabase {
   MODE: 'test' | 'develop' | 'prod';
@@ -35,21 +36,34 @@ interface JwtOption {
   secret: string;
   expiresIn: string;
 }
+
+interface LoggerOption {
+  level: LevelWithSilent;
+  ignore: string[];
+  singleLine: boolean;
+}
 export interface Configuration {
   mode: 'test' | 'develop' | 'prod';
   isDev: boolean;
   database: DataSourceOptions;
   jwt: JwtOption;
+  logger: LoggerOption;
 }
 
 export const config = (): Configuration => {
+  const isDev = process.env.MODE !== 'prod';
   return {
     mode: process.env.MODE,
-    isDev: process.env.MODE !== 'prod',
+    isDev,
     database: getDatabase(process.env),
     jwt: {
       secret: process.env.JWT_SECRET,
       expiresIn: process.env.JWT_EXPIRES_IN,
+    },
+    logger: {
+      level: isDev ? 'debug' : 'info',
+      ignore: isDev ? ['pid', 'hostname'] : [],
+      singleLine: isDev ? false : true,
     },
   };
 };

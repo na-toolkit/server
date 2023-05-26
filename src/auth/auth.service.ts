@@ -6,10 +6,7 @@ import {
 } from '@/accounts/entities/account.entity';
 import { ErrorMessageCode } from '@/shared/types/errorMessageCode';
 import { validEncrypt } from '@/utils/bcrypt';
-import {
-  handleBadRequestException,
-  handleUnauthorizedException,
-} from '@/utils/formatException';
+import { handleGeneralException } from '@/utils/generalException';
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -95,7 +92,7 @@ export class AuthService {
       result = await validEncrypt(password, account.password);
     }
     if (!result) {
-      throw handleBadRequestException({
+      throw handleGeneralException('BAD_REQUEST', {
         messageCode: ErrorMessageCode.BAD_REQUEST,
         log: '帳號或密碼不正確',
       });
@@ -107,26 +104,26 @@ export class AuthService {
     auth: string | undefined,
   ): Promise<[string, jwtPayload]> {
     if (!auth) {
-      throw handleUnauthorizedException({
+      throw handleGeneralException('UNAUTHORIZED', {
         log: '無法找到相關的權限驗證信息',
       });
     }
 
     const [type, token] = auth.split(' ');
     if (type !== 'Bearer') {
-      throw handleUnauthorizedException({
+      throw handleGeneralException('UNAUTHORIZED', {
         log: '帳號的權限驗證信息不合法',
       });
     }
     const payload = await this.validateToken(token);
     if (!payload) {
-      throw handleUnauthorizedException({
+      throw handleGeneralException('UNAUTHORIZED', {
         log: '帳號的權限驗證信息不合法',
       });
     }
     const { accountUid } = payload;
     if (!accountUid) {
-      throw handleUnauthorizedException({
+      throw handleGeneralException('UNAUTHORIZED', {
         log: '帳號的權限驗證信息不合法: accountUid is empty',
       });
     }
@@ -138,14 +135,14 @@ export class AuthService {
     try {
       const account = await this.getValidAccount(accountUid, 'accountUid');
       if (account === null) {
-        throw handleUnauthorizedException({
+        throw handleGeneralException('UNAUTHORIZED', {
           log: '帳號不存在或被凍結',
         });
       }
       return account;
     } catch (err) {
       if (err instanceof HttpException) throw err;
-      throw handleUnauthorizedException({
+      throw handleGeneralException('UNAUTHORIZED', {
         log: `帳號不存在或被凍結: ${err?.message}`,
       });
     }

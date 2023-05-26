@@ -6,8 +6,7 @@ import {
 } from '@nestjs/common';
 import { ObjectSchema, Root } from 'joi';
 import * as Joi from 'joi';
-import { handleBadRequestException } from './utils/formatException';
-import { ErrorMessageCode } from './shared/types/errorMessageCode';
+import { handleGeneralException } from './utils/generalException';
 
 type DtoWithSchema = Type & { schema?: (joi: Root) => ObjectSchema };
 
@@ -25,10 +24,8 @@ export class GqlJoiToDtoPipe implements PipeTransform {
     } else this.dtoRegister[dtosWithSchema.name] = dtosWithSchema;
   }
 
-  transform(value: any, metadata: ArgumentMetadata) {
+  transform(value: unknown, metadata: ArgumentMetadata) {
     const { type, data, metatype } = metadata;
-    console.log(metadata);
-    console.log(metatype?.name);
     if (
       type === 'body' &&
       data === 'input' &&
@@ -39,10 +36,7 @@ export class GqlJoiToDtoPipe implements PipeTransform {
       if (schemaFunc) {
         const { error } = schemaFunc(Joi).validate(value);
         if (error) {
-          throw handleBadRequestException({
-            messageCode: ErrorMessageCode.BAD_REQUEST,
-            log: error.message,
-          });
+          throw handleGeneralException('BAD_REQUEST', { log: error.message });
         }
       }
     }
