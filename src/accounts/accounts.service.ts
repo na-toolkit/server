@@ -1,5 +1,5 @@
 import { OmitTable } from '@/utils/omitTable';
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { CreateAccountInput } from './dto/create-account.input';
@@ -21,16 +21,46 @@ import {
   InviteCodeStatus,
   InviteCodeTable,
 } from '@/invite-code/entities/invite-code.entity';
+import { InjectQueue } from '@nestjs/bull';
+import {
+  ACCOUNT_SCHEDULE_NAME,
+  ACCOUNT_SCHEDULE_PRINT_LOGGER_NAME,
+} from './const';
+import { Queue } from 'bull';
+import { PinoLogger } from 'nestjs-pino';
 
 @Injectable()
-export class AccountsService {
+export class AccountsService implements OnApplicationBootstrap {
   constructor(
     @InjectRepository(AccountTable)
     private readonly accountRepo: Repository<AccountTable>,
     private readonly authService: AuthService,
     private readonly inviteCodeService: InviteCodeService,
     private readonly dataSource: DataSource,
-  ) {}
+    @InjectQueue(ACCOUNT_SCHEDULE_NAME)
+    private readonly scheduleQueue: Queue,
+    private readonly logger: PinoLogger,
+  ) {
+    this.logger.setContext(AccountsService.name);
+  }
+
+  async onApplicationBootstrap() {
+    this.logger.debug(new Date().toString());
+    // 清除 repeat job
+    const job = await this.scheduleQueue.getRepeatableJobs();
+    for (const { key } of job) {
+      this.scheduleQueue.removeRepeatableByKey(key);
+    }
+    this.registerSchedule();
+  }
+
+  private async registerSchedule() {
+    // await this.scheduleQueue.add(
+    //   ACCOUNT_SCHEDULE_PRINT_LOGGER_NAME,
+    //   {},
+    //   { repeat: { cron: '* * * * * *' } },
+    // );
+  }
 
   private formatCreateAccountInput<
     T extends Omit<CreateAccountInput, 'passwordInput' | 'code'> & {
@@ -49,6 +79,10 @@ export class AccountsService {
       status,
       ...rest,
     };
+  }
+
+  async printLogger(date: Date) {
+    this.logger.debug(date.toISOString(), 'accounts schedule print logger');
   }
 
   async create(createInput: CreateAccountInput): Promise<boolean> {

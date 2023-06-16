@@ -10,6 +10,8 @@ import { SentencesModule } from '@/sentences/sentences.module';
 import { CustomLoggerModule } from '@/shared/modules/custom-logger/custom-logger.module';
 import { CustomTypeormModule } from '@/shared/modules/custom-typeorm/custom-typeorm.module';
 import { CustomGraphqlModule } from '@/shared/modules/custom-graphql/custom-graphql.module';
+import { BullModule } from '@nestjs/bull';
+import { CustomConfigService } from '@/shared/modules/custom-config/custom-config.service';
 
 export type ErrorContent = {
   statusCode: number;
@@ -23,6 +25,12 @@ export type ErrorContent = {
     CustomLoggerModule,
     CustomTypeormModule,
     CustomGraphqlModule,
+    BullModule.forRootAsync({
+      inject: [CustomConfigService],
+      useFactory: (configService: CustomConfigService) => ({
+        redis: configService.get('redis'),
+      }),
+    }),
     AuthModule,
     AccountsModule,
     SentencesModule,

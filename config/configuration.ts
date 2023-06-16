@@ -8,6 +8,8 @@ interface Env extends EnvDatabase {
   JWT_SECRET: 'string';
   JWT_EXPIRES_IN: 'string';
   ORIGIN: string;
+  REDIS_HOST: string;
+  REDIS_PORT: string;
 }
 
 export const validationSchema = Joi.object<Env, true>({
@@ -23,6 +25,8 @@ export const validationSchema = Joi.object<Env, true>({
   JWT_SECRET: Joi.string().required(),
   JWT_EXPIRES_IN: Joi.string().required(),
   ORIGIN: Joi.string().allow(''),
+  REDIS_HOST: Joi.string().required(),
+  REDIS_PORT: Joi.string().regex(/^\d+$/).required(),
 });
 
 /* eslint-disable @typescript-eslint/no-namespace, @typescript-eslint/no-empty-interface */
@@ -43,12 +47,18 @@ interface LoggerOption {
   ignore: string[];
   singleLine: boolean;
 }
+
+interface RedisOption {
+  host: string;
+  port: number;
+}
 export interface Configuration {
   mode: 'test' | 'develop' | 'prod';
   isDev: boolean;
   database: DataSourceOptions;
   jwt: JwtOption;
   logger: LoggerOption;
+  redis: RedisOption;
 }
 
 export const isDev = () => process.env.MODE !== 'prod';
@@ -67,6 +77,10 @@ export const config = (): Configuration => {
       level: isDevRes ? 'debug' : 'info',
       ignore: isDevRes ? ['pid', 'hostname'] : [],
       singleLine: isDevRes ? false : true,
+    },
+    redis: {
+      host: process.env.REDIS_HOST,
+      port: parseInt(process.env.REDIS_PORT, 10),
     },
   };
 };
